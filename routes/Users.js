@@ -1,26 +1,55 @@
-const express = require('express')
-const users = express.Router()
-const cors = require('cors')
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
+const dbConnection = require('../Databases/connect');
+var express = require('express');
+const path = require('path');
+const cookieSession = require('cookie-session');
+const bcrypt = require('bcrypt');
+const { body, validationResult } = require('express-validator');
+var router = express.Router();
 
-const User = require('../models/MySqluser')
-users.use(cors())
 
-process.env.SECRET_KEY = 'secret'
+var bodyparser = require('body-parser');
+const { Router } = require('express');
 
-users.post('/register', (req, res) => {
+/*
+router.get('/',(req,res)=>{
+    connection.query('select * from users',(err,array,feilds)=>{
+        res.send(array);
+    });
+});
+module.exports = router;*/
+//
+// FOR MYSQL DB
+//FETCH
+//import the fetch module
+/*
+var fetch = require('../Databases/fetch');
+app.use('/fetch',fetch);
+
+var insert = require('../Databases/insert');
+app.use('/insert',insert);
+
+var update = require('./update/update');
+app.use('/update',update);
+
+var remove = require('./delete/delete');
+app.use('/delete',remove);
+8*/
+
+
+
+router.post('/register', (req, res) => {
   console.log(req.body);
-  const today = new Date()
+  const created = new Date()
   const userData = {
     first_name: req.body.first_name,
     last_name: req.body.last_name,
+    institute: req.body.institute,
     email: req.body.email,
+    contact: req.body.contact,
     password: req.body.password,
-    created: today
   }
 
-  const { first_name, last_name, email, password, password2 } = req.body;
+  const { first_name, last_name, email,institute,contact, password, password2 } = req.body;
   let errors = [];
 
   if (!first_name || !last_name|| !email || !password || !password2) {
@@ -44,33 +73,40 @@ users.post('/register', (req, res) => {
       
   } else {
 
-  User.findOne({
-    where: {
-      email: req.body.email
-    }
-  })
+    dbConnection.execute('SELECT `email` FROM `users` WHERE `email`=?', [email])
+    .then(([rows]) => {
+        if(rows.length > 0){
+         //   return Promise.reject('This E-mail already in use!');
+         res.send(`This E-mail already in use! `);
+
+        }
+        return true;
+    })
+  
     //TODO bcrypt
     .then(user => {
-      if (!user) {
-        bcrypt.hash(req.body.password, 10, (err, hash) => {
-          userData.password = hash
-          User.create(userData)
-            .then(user => {
-              res.json({ status: user.email + 'Registered!' })
-            })
-            .catch(err => {
-              res.send('error: ' + err)
-            })
-        })
-      } else {
-        res.json({ error: 'User already exists' })
-      }
+      bcrypt.hash(password, 12).then((hash_pass) => {
+        // INSERTING USER INTO DATABASE
+        dbConnection.execute("INSERT INTO `users`(`first_name`,`last_name`, `email`,`institute`, `contact`,`password`,`created`) VALUES(?,?,?,?,?,?,?)",
+        [first_name,last_name, email,institute, contact,hash_pass,created])
+        .then(result => {
+            res.send(`your account has been created successfully... `);
+        }).catch(err => {
+            // THROW INSERTING USER ERROR'S
+            if (err) throw err;
+        });
     })
-    .catch(err => {
-      res.send('error: ' + err)
+    
     })}
-})
+});
 
+    // COLLECT ALL THE VALIDATION ERRORS
+  
+    // REDERING login-register PAGE WITH VALIDATION ERRORS
+
+// END OF REGISTER PAGE
+
+/*
 users.post('/login', (req, res) => {
   User.findOne({
     where: {
@@ -112,6 +148,6 @@ users.get('/dashboard', (req, res) => {
     .catch(err => {
       res.send('error: ' + err)
     })
-})
+})*/
 
-module.exports = users
+module.exports = router;
