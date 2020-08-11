@@ -52,27 +52,6 @@ router.post('/register', (req, res) => {
   const { first_name, last_name, email,institute,contact, password, password2 } = req.body;
   let errors = [];
 
-  if (!first_name || !last_name|| !email || !password || !password2) {
-    errors.push({ msg: 'Please enter all fields' });
-  }
-
-  if (password != password2) {
-    errors.push({ msg: 'Passwords do not match' });
-  }
-
-  if (password.length < 6) {
-    errors.push({ msg: 'Password must be at least 6 characters' });
-  }
-  
- 
-  if (errors.length > 0) {
-   // res.statusCode=500;
-   //res.setHeader('content-type', 'application/json')
-   //res.send();
-    res.json({errors});
-      
-  } else {
-
     dbConnection.execute('SELECT `email` FROM `users` WHERE `email`=?', [email])
     .then(([rows]) => {
         if(rows.length > 0){
@@ -90,6 +69,7 @@ router.post('/register', (req, res) => {
         dbConnection.execute("INSERT INTO `users`(`first_name`,`last_name`, `email`,`institute`, `contact`,`password`,`created`) VALUES(?,?,?,?,?,?,?)",
         [first_name,last_name, email,institute, contact,hash_pass,created])
         .then(result => {
+          console.log("done");
             res.send(`your account has been created successfully... `);
         }).catch(err => {
             // THROW INSERTING USER ERROR'S
@@ -97,7 +77,7 @@ router.post('/register', (req, res) => {
         });
     })
     
-    })}
+    })
 });
 
     // COLLECT ALL THE VALIDATION ERRORS

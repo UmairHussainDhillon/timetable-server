@@ -1,77 +1,81 @@
-const dbConnection = require('../Databases/connect');
-const { body, validationResult } = require('express-validator');
+const dbConnection = require("../Databases/connect");
+const { body, validationResult } = require("express-validator");
 
-const express = require('express');
-const path = require('path');
-const cookieSession = require('cookie-session');
-const bcrypt = require('bcrypt');
-var jwt = require('jsonwebtoken');
+const express = require("express");
+const path = require("path");
+const cookieSession = require("cookie-session");
+const bcrypt = require("bcrypt");
+var jwt = require("jsonwebtoken");
 
-var bodyparser = require('body-parser');
+var bodyparser = require("body-parser");
 
-var bodyparser = require('body-parser');
-const { Router } = require('express');
+var bodyparser = require("body-parser");
+const { Router } = require("express");
 var router = express.Router();
 
-
-process.env.SECRET_KEY = 'secret';
+process.env.SECRET_KEY = "secret";
 
 //
 // LOGIN PAGE
-router.post('/login', [
-    body('email').custom((value) => {
-        return dbConnection.execute('SELECT `email` FROM `users` WHERE `email`=?', [value])
+let result = {};
+let status = 200;
+
+router.post("/login", (req, res) => {
+    const { password, email } = req.body;
+console.log(req.body);
+      dbConnection.execute("SELECT * FROM `users` WHERE `email`=?", [email])
         .then(([rows]) => {
-            console.log(rows.length)
-            if(rows.length >0 ){
-                return true;
-                
+            if(rows.length >1){
+              console.log('Email not found')
             }
-            return Promise.reject('Invalid Email Address!');
-         // return(`Invalid E-mail Address! `);
             
-        });
-    }),
-    body('password','Password is empty!').trim().not().isEmpty(),
-    body('email','email is empty!').trim().not().isEmpty(),
+          else{
 
-], (req, res) => {
-    console.log(req.body);
-    const validation_result = validationResult(req);
-    const {password, email} = req.body;
-    if(validation_result.isEmpty()){
-        
-        dbConnection.execute("SELECT * FROM `users` WHERE `email`=?",[email])
-        .then(([rows]) => {
-            bcrypt.compare(password, rows[0].password).then(compare_result => {
-                    if(compare_result === true){
-                  //  let token = jwt.sign(req.body.dataValues, process.env.SECRET_KEY, {
-                   //     expiresIn: 1440
-                  //    })
-                  //    res.send(token)
-                    res.send('You are Logged in');
-              //   res.redirect('/dashboard');
-                }
-             else{
-                    res.status(400).json({ error: 'Invalid Password!' })
-                }
+          bcrypt
+            .compare(password, rows[0].password)
+            .then((compare_result) => {
+              if (compare_result === true) {
+                //  let token = jwt.sign(req.body.dataValues, process.env.SECRET_KEY, {
+                //     expiresIn: 1440
+                //    })
+                //    res.send(token)
+                status = 200;
+                // Create a token
+                const payload = { user: email };
+                const options = {
+                  expiresIn: "2d",
+                //  issuer: "https://scotch.io",
+                };
+                const secret = process.env.SECRET_KEY;
+                const token = jwt.sign(payload, secret, options);
+
+              
+                result.token = token;
+                result.status = status;
+                // result.result = user;
+                result.user = {
+                    first_name: rows[0].first_name,
+                    last_name: rows[0].last_name,
+                    institute: rows[0].institute,
+                    email: rows[0].email,
+                    contact: rows[0].contact,
+                  };
+               // res.send(result.token);
+                //   res.redirect('/dashboard');
+              } else {
+                //  res.status(400).json({ error: 'Invalid Password!' })
+                status = 401;
+                result.status = status;
+                result.error = `Invalid Password `;
+              }
+              res.status(status).send(result);
             })
-            .catch(err => {
-                if (err) throw err;
-
+            .catch((err) => {
+              if (err) throw err;
             });
 
-
-        }).catch(err => {
-            if (err) throw err;
-        });
-    }
-    else{
-        let allErrors = validation_result.errors.map((error) => {
-            res.send(error.msg) 
-        });
-        // REDERING login-register PAGE WITH LOGIN VALIDATION ERRORS
-    }
+        
+    }} );
 });
 
 module.exports = router;

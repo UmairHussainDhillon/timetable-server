@@ -46,7 +46,7 @@ var fetch = require('./Databases/fetch')
 app.use('/fetch', fetch);
 //
 var RegisterRouter = require('./routes/Users')
-app.use('/users', RegisterRouter);
+app.use('/', RegisterRouter);
 //
 var LoginRouter = require('./routes/Login')
 app.use('/users', LoginRouter);
@@ -58,6 +58,7 @@ app.get("/user", (req, res) => {
 });
 //----------------------------------------- END OF ROUTES---------------------------------------------------
 //Start Server
-app.listen(5000, () => {
-  console.log("Server Has Started on PORT: 5000");
+PORT= process.env.PORT||5000;
+app.listen(PORT, () => {
+  console.log("Server Has Started on PORT: "+ PORT);
 });
