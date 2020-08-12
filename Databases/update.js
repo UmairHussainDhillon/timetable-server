@@ -1,20 +1,30 @@
-var con = require("../db_connection");
-var connection = con.getConnection();
-connection.connect();
+var connection = require('./connect');
 var express = require("express");
 var router = express.Router();
-router.post("/",(req,res)=>{
-    var e_id = req.body.e_id;
-    var e_name = req.body.e_name;
-    var e_sal = req.body.e_sal;
-    connection.query("update users set first_name='"+e_name+"',e_sal="+e_sal+" where e_id="+e_id,
-                    (err,result)=>{
-        if(err){
-            res.send({"update":"fail"});
-        }else{
-            res.send({"update":"success"});
-        }
-    });
+
+router.post("/update",(req,res)=>{
+    console.log(req.body)
+    var user_id = req.body.user_id;
+    var first_name = req.body.first_name;
+    var contact = req.body.contact;
+  //  var sql = "UPDATE users SET first_name = 'Canyon'  WHERE `user_id`='?', [id]";
+  let sql = `UPDATE users
+           SET first_name = ?
+           WHERE user_id = ?`;
+
+let data = [first_name, user_id];
+
+// execute the UPDATE statement
+connection.query(sql, data, (error, results, fields) => {
+  if (error){
+    return console.error(error.message);
+  }
+  else{
+  console.log('Rows affected:', results.affectedRows);
+  res.send(results)}
+});
+
+   
 });
 
 module.exports = router;

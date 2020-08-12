@@ -44,12 +44,21 @@ app.use('/users',userRouter);
 //
 var fetch = require('./Databases/fetch')
 app.use('/fetch', fetch);
+
+//
+var Update = require('./Databases/update')
+app.use('/', Update);
+
 //
 var RegisterRouter = require('./routes/Users')
 app.use('/', RegisterRouter);
 //
 var LoginRouter = require('./routes/Login')
 app.use('/users', LoginRouter);
+
+//
+var ResetRouter = require('./routes/auth')
+app.use('/', ResetRouter);
 
 //
 

@@ -1,0 +1,96 @@
+const express = require('express')
+var connection = require('../Databases/connect');
+const router = express.Router()
+const crypto = require('crypto')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const nodemailer = require('nodemailer')
+const sendgridTransport = require('nodemailer-sendgrid-transport')
+
+// Create Transport
+const transporter = nodemailer.createTransport(sendgridTransport({
+    auth:{
+        api_key:"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"
+    }
+}))
+
+
+// REset Password Route
+
+router.post('/reset-password',(req,res)=>{
+    email=req.body.email;
+
+    crypto.randomBytes(32,(err,buffer)=>{
+        if(err){
+            console.log(err)
+        }
+        const token = buffer.toString("hex")
+      //  User.findOne({email:req.body.email})
+      connection.execute('SELECT `email` FROM `users` WHERE `email`=?', [email])
+    .then(([rows]) => {
+        if(rows.length == 0){
+         //   return Promise.reject('This E-mail already in use!');
+         return res.status(422).json({error:"User dont exists with that email"})
+
+        }
+       
+
+// execute the UPDATE statement
+console.log(req.body)
+        reset_token = token
+        expire_token = Date.now() + 3600000;
+        let sql = `UPDATE users
+        SET reset_token = ?,
+        expire_token = ?
+        WHERE email = ?`;
+
+let data = [reset_token,expire_token, email];
+        connection.query(sql, data, (error, results, fields) => {
+            if (error){
+             return console.error(error.message);
+            }
+            else{
+            console.log('Rows affected:', results.affectedRows);
+            res.send(results)}
+            }).then((result)=>{
+            transporter.sendMail({
+                to:email,
+                from:"umairdhillun.uh@gmail.com",
+                subject:"Password Reset Link",
+                html:` <h3>You requested for Password Reset for Your Timetable Management System Account</h3>
+                <h4>click in this <a href="${email}/reset/${token}">link</a> to reset password</h4>
+                `
+            })
+            res.json({message:"check your email"})
+    })
+       
+        
+
+        })
+    })
+})
+/*
+// New Password Route
+router.post('/new-password',(req,res)=>{
+    const newPassword = req.body.password
+    const sentToken = req.body.token
+    User.findOne({resetToken:sentToken,expireToken:{$gt:Date.now()}})
+    .then(user=>{
+        if(!user){
+            return res.status(422).json({error:"Try again session expired"})
+        }
+        bcrypt.hash(newPassword,12).then(hashedpassword=>{
+           user.password = hashedpassword
+           user.resetToken = undefined
+           user.expireToken = undefined
+           user.save().then((saveduser)=>{
+               res.json({message:"password updated success"})
+           })
+        })
+    }).catch(err=>{
+        console.log(err)
+    })
+})
+*/
+
+module.exports = router;

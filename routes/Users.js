@@ -10,6 +10,16 @@ var router = express.Router();
 var bodyparser = require('body-parser');
 const { Router } = require('express');
 
+const nodemailer = require('nodemailer')
+const sendgridTransport = require('nodemailer-sendgrid-transport')
+
+// Create Transport
+const transporter = nodemailer.createTransport(sendgridTransport({
+    auth:{
+        api_key:"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"
+    }
+}))
+
 /*
 router.get('/',(req,res)=>{
     connection.query('select * from users',(err,array,feilds)=>{
@@ -48,13 +58,13 @@ router.post('/register', (req, res) => {
     contact: req.body.contact,
     password: req.body.password,
   }
-
   const { first_name, last_name, email,institute,contact, password, password2 } = req.body;
   let errors = [];
 
     dbConnection.execute('SELECT `email` FROM `users` WHERE `email`=?', [email])
     .then(([rows]) => {
         if(rows.length > 0){
+          console.log(rows.length)
          //   return Promise.reject('This E-mail already in use!');
          res.send(`This E-mail already in use! `);
 
@@ -70,7 +80,15 @@ router.post('/register', (req, res) => {
         [first_name,last_name, email,institute, contact,hash_pass,created])
         .then(result => {
           console.log("done");
-            res.send(`your account has been created successfully... `);
+          res.send(`your account has been created successfully... `);
+          transporter.sendMail({
+               to:email,
+              from:"umairdhillun.uh@gmail.com",
+               subject:`Welcome To Timetable Management System`,
+                 html:`<h1>Hi ${first_name} </h1>
+                 <p>You have Successfully Signed Up in Timetable Management System Now you can create Timetable</p>`
+             })
+       
         }).catch(err => {
             // THROW INSERTING USER ERROR'S
             if (err) throw err;
