@@ -43,11 +43,15 @@ app.use('/users',userRouter);
 
 //
 var fetch = require('./Databases/fetch')
-app.use('/fetch', fetch);
+app.use('/', fetch);
 
 //
 var Update = require('./Databases/update')
 app.use('/', Update);
+
+//
+var BS4Course = require('./routes/courses/bs4_course')
+app.use('/', BS4Course);
 
 //
 var RegisterRouter = require('./routes/Users')
