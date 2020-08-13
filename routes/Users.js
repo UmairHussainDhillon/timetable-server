@@ -81,13 +81,13 @@ router.post('/register', (req, res) => {
         .then(result => {
           console.log("done");
           res.send(`your account has been created successfully... `);
-          transporter.sendMail({
+         /* transporter.sendMail({
                to:email,
               from:"umairdhillun.uh@gmail.com",
                subject:`Welcome To Timetable Management System`,
                  html:`<h1>Hi ${first_name} </h1>
                  <p>You have Successfully Signed Up in Timetable Management System Now you can create Timetable</p>`
-             })
+             })*/
        
         }).catch(err => {
             // THROW INSERTING USER ERROR'S
