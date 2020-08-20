@@ -53,6 +53,12 @@ app.use('/', Update);
 var BS4Course = require('./routes/courses/bs4_course')
 app.use('/', BS4Course);
 
+
+//
+var AddInstructor = require('./routes/AddInstructor')
+app.use('/', AddInstructor);
+
+
 //
 var RegisterRouter = require('./routes/Users')
 app.use('/', RegisterRouter);
