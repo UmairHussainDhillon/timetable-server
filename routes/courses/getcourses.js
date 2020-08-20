@@ -3,7 +3,7 @@ var express = require('express');
 
 var router = express.Router();
 
-router.post('/bs4courses',(req,res)=>{
+router.post('/getcourses',(req,res)=>{
     console.log(req.body)
     semester=req.body.semester
     connection.execute('SELECT * FROM `courses` WHERE `semester`=?', [semester])

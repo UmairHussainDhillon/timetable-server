@@ -50,8 +50,11 @@ var Update = require('./Databases/update')
 app.use('/', Update);
 
 //
-var BS4Course = require('./routes/courses/bs4_course')
-app.use('/', BS4Course);
+var GetCourses = require('./routes/courses/getcourses')
+app.use('/', GetCourses);
+
+
+//
 
 
 //
