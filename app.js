@@ -61,7 +61,9 @@ app.use('/', GetCourses);
 var AddInstructor = require('./routes/AddInstructor')
 app.use('/', AddInstructor);
 
-
+//
+var TimetableRouter = require('./routes/courses/Timetable')
+app.use('/', TimetableRouter);
 //
 var RegisterRouter = require('./routes/Users')
 app.use('/', RegisterRouter);
