@@ -17,6 +17,9 @@ router.post("/timetable", (req, res) => {
     classroom_id = req.body.classroom_id;
   //  course_id = req.body.course_id;
   let errors = [];
+  let Results ={};
+  var StrongConstraint=false;
+  var WeakConstraint=false;
 
   var timetable = [];
   //To get assisgned teacher of Course 
@@ -42,6 +45,8 @@ router.post("/timetable", (req, res) => {
       // Friday Prayer Time
       if(day_id == 5 && slot_id ==3){
         errors.push("Friday Prayer Time");
+        StrongConstraint=true;
+
       }
       // for same Instructor
       for (let i = 0; i < timetable.length; i++) {
@@ -51,6 +56,7 @@ router.post("/timetable", (req, res) => {
           timetable[i].day_id == day_id
         ) {
           errors.push("Instructor Can't teach two Classes at Same Time");
+          StrongConstraint=true;
           //     console.log(timetable[i].timetable_id);
           //  status= false;
           break;
@@ -64,6 +70,8 @@ router.post("/timetable", (req, res) => {
           timetable[i].day_id == day_id
         ) {
           errors.push("Two Classes of Same Course cant be at same time");
+          StrongConstraint=true;
+
           //     console.log(timetable[i].timetable_id);
           //  status= false;
           break;
@@ -77,6 +85,8 @@ router.post("/timetable", (req, res) => {
           timetable[i].day_id == day_id
         ) {
           errors.push("Classroom Can't be used for Two Classes at Same Time");
+          StrongConstraint=true;
+
           break;
         }
       }
@@ -102,8 +112,11 @@ router.post("/timetable", (req, res) => {
             }
           });
       } else {
-        console.log(errors)
-        res.status(422).send(errors);
+        Results.errors=errors;
+        Results.StrongConstraint=StrongConstraint;
+        Results.WeakConstraint=WeakConstraint;
+        console.log(Results)
+        res.send(Results);
       }
   
     });
