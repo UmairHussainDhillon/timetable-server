@@ -7,25 +7,36 @@ const { Router } = require("express");
 var router = express.Router();
 
 router.post("/timetable", (req, res) => {
-  // console.log(req.body);
+   console.log(req.body);
 
-  (instructor_id = req.body.instructor_id),
-    (instructor = req.body.instructor_id),
-    (day_id = req.body.day_id),
-    (slot_id = req.body.slot_id),
-    (slot = req.body.slot_id),
-    (classroom_id = req.body.classroom_id),
-    (course_id = req.body.course_id);
-
+ var  instructor_id ,
+ Course_id = req.body.Course_id;
+    day_id = req.body.day_id,
+    slot_id = req.body.slot_id,
+    slot = req.body.slot_id,
+    classroom_id = req.body.classroom_id;
+  //  course_id = req.body.course_id;
   let errors = [];
+
   var timetable = [];
+  //To get assisgned teacher of Course 
+  dbConnection.execute("SELECT * FROM `courses` WHERE `course_id`=?", [
+    Course_id,
+  ]).then(([rows]) => {
+    console.log(rows.length)
+    if(rows[0].instructor_id==null){
+      console.log("No Instructor")
+      errors.push("Please Assign a Instructor First")
+    }
+    instructor_id = rows[0].instructor_id;
+
+  });
 
   dbConnection
     .execute("SELECT * FROM `timetable` ")
     .then(([rows]) => {
       timetable = rows;
 
-      console.log(timetable.length);
               //Constraints  Bussiness Logic
 
       // Friday Prayer Time
@@ -48,7 +59,7 @@ router.post("/timetable", (req, res) => {
       // for same Course at same Time
       for (let i = 0; i < timetable.length; i++) {
         if (
-          timetable[i].course_id == course_id &&
+          timetable[i].course_id == Course_id &&
           timetable[i].slot_id == slot_id &&
           timetable[i].day_id == day_id
         ) {
@@ -78,7 +89,7 @@ router.post("/timetable", (req, res) => {
         dbConnection
           .execute(
             "INSERT INTO `timetable`(`course_id`, `instructor_id`, `slot_id`,`day_id`,`classroom_id`) VALUES(?,?,?,?,?)",
-            [course_id, instructor_id, slot_id, day_id, classroom_id]
+            [Course_id, instructor_id, slot_id, day_id, classroom_id]
           )
           .then((result) => {
             console.log("done");
@@ -91,9 +102,10 @@ router.post("/timetable", (req, res) => {
             }
           });
       } else {
-
-        res.status(400).send(errors);
+        console.log(errors)
+        res.status(422).send(errors);
       }
+  
     });
 });
 
