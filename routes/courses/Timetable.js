@@ -84,6 +84,7 @@ router.post("/timetable", (req, res) => {
        // No Classroom is Free
          errors.push("No Classroom is Free");
          WeakConstraint=true;
+         break;
        }
        else{if ( timetable[i].day_id == day_id) {
         // To go to Particular Day in Table:
