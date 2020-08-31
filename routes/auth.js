@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport(sendgridTransport({
 
 router.post('/reset-password',(req,res)=>{
     email=req.body.email;
-
+var Result;
     crypto.randomBytes(32,(err,buffer)=>{
         if(err){
             console.log(err)
@@ -29,8 +29,10 @@ router.post('/reset-password',(req,res)=>{
       connection.execute('SELECT `email` FROM `users` WHERE `email`=?', [email])
     .then(([rows]) => {
         if(rows.length == 0){
+            Result.status=422;
+            Result.msg="User dont exists with that email"
          //   return Promise.reject('This E-mail already in use!');
-         return res.json({msg:"User dont exists with that email"})
+         return res.send(Result);
 
         }
        
@@ -47,12 +49,15 @@ console.log(req.body)
 let data = [reset_token,expire_token, email];
         connection.query(sql, data, (error, results, fields) => {
             if (error){
-                console.log("Working")
-                res.json({msg:"Error Ocurred!"})
+                Result.status=422;
+                Result.msg=error;
+             return res.send(Result);
             }
             else{
             console.log('Rows affected:', results.affectedRows);
-            res.send(results)}
+            Result.status=200;
+            Result.msg="Successful Now You Can Login"
+          res.send(Result);}
             }).then((result)=>{
             transporter.sendMail({
                 to:email,
@@ -62,8 +67,10 @@ let data = [reset_token,expire_token, email];
                 <h4>click in this <a href="http://localhost:3000/new-password/${token}">link</a> 
                 to reset password</h4>`
             }).catch(error => console.log(error))
-            res.json({msg:"check your email"})
-    })
+
+            Result.status=200;
+            Result.msg="Successful Now You Can Login"
+         return res.send(Result);        })
        
         
 
@@ -79,6 +86,7 @@ router.post('/new-password',(req,res)=>{
 
     connection.execute('SELECT * FROM `users` WHERE `reset_token`=?', [sentToken])
     .then(([rows]) => {
+        console.log(rows)
         if(rows.length === 0 && rows[0].expire_token > Date.now){
           console.log("rows length 0")
          //   return Promise.reject('This E-mail already in use!');
@@ -97,7 +105,8 @@ connection.query(sql, data, (error, results, fields) => {
     }
     else{
     console.log('Rows affected:', results.affectedRows);
-    res.send({msg:"Password Reset Succefull. Now You can Login"})
+    
+     res.send({msg:"Password Reset Succefull. Now You can Login"})
 }
 });
 });

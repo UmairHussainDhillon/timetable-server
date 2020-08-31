@@ -10,6 +10,10 @@ router.post("/timetable", (req, res) => {
   console.log(req.body);
 
   var instructor_id;
+  var semester;
+  var course_name;
+
+
  // var classroom_id;
 
     Course_id = req.body.Course_id;
@@ -34,7 +38,14 @@ router.post("/timetable", (req, res) => {
         errors.push("Please Assign a Instructor First");
       }
       instructor_id = rows[0].instructor_id;
+
+      semester = rows[0].semester;
+      course_name = rows[0].course_name;
+
+      console.log(semester);
+
     });
+
 
   dbConnection
     .execute("SELECT * FROM `timetable` ")
@@ -106,8 +117,8 @@ router.post("/timetable", (req, res) => {
         console.log(Course_id,instructor_id,slot_id,day_id,classroom_id)
         dbConnection
           .execute(
-            "INSERT INTO `timetable`(`course_id`, `instructor_id`, `slot_id`,`day_id`,`classroom_id`) VALUES(?,?,?,?,?)",
-            [Course_id, instructor_id, slot_id, day_id, classroom_id]
+            "INSERT INTO `timetable`(`course_id`, `instructor_id`, `slot_id`,`day_id`,`classroom_id`, `semester`,`course_name`) VALUES(?,?,?,?,?,?,?)",
+            [Course_id, instructor_id, slot_id, day_id, classroom_id,semester,course_name]
           )
           .then((result) => {
             console.log("done");
@@ -117,7 +128,7 @@ router.post("/timetable", (req, res) => {
             // THROW INSERTING  ERROR'S
             if (err) {
               res.send(err);
-            }
+            } 
           });
       } else {
         Results.errors = errors;
@@ -128,5 +139,27 @@ router.post("/timetable", (req, res) => {
       }
     });
 });
+router.get('/viewtimetable', function (req, res) {
+  var data="Hello World";
+  dbConnection
+  .execute("SELECT * FROM `timetable` ")
+  .then(([rows]) => {
+    if(rows.length===0){
+      data="No Record Found! Please Create Timetable First"
+      res.send(data)
+    }
+    else{
+      data = rows;
+      console.log("Data Send: ")
+      res.send(data)
+    }
+}) .catch((err) => {
+  // THROW INSERTING  ERROR'S
+  if (err) {
+    res.send(err);
+  }
+});
+});
+
 
 module.exports = router;
