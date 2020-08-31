@@ -78,7 +78,7 @@ app.use('/', ResetRouter);
 //
 
 app.get("/user", (req, res) => {
-  res.send("its Working !"); // The req.user stores the entire user that has been authenticated inside of it.
+  res.send("its Working !"); // To check Route
 });
 //----------------------------------------- END OF ROUTES---------------------------------------------------
 //Start Server

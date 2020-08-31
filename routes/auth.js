@@ -30,7 +30,7 @@ router.post('/reset-password',(req,res)=>{
     .then(([rows]) => {
         if(rows.length == 0){
          //   return Promise.reject('This E-mail already in use!');
-         return res.status(422).json({error:"User dont exists with that email"})
+         return res.json({msg:"User dont exists with that email"})
 
         }
        
@@ -47,7 +47,8 @@ console.log(req.body)
 let data = [reset_token,expire_token, email];
         connection.query(sql, data, (error, results, fields) => {
             if (error){
-             return console.error(error.message);
+                console.log("Working")
+                res.json({msg:"Error Ocurred!"})
             }
             else{
             console.log('Rows affected:', results.affectedRows);
@@ -58,10 +59,10 @@ let data = [reset_token,expire_token, email];
                 from:"umairdhillun.uh@gmail.com",
                 subject:"Password Reset Link",
                 html:` <h3>You requested for Password Reset for Your Timetable Management System Account</h3>
-                <h4>click in this <a href="http://localhost:3000/new-password/${token}">link</a> to reset password</h4>
-                `
+                <h4>click in this <a href="http://localhost:3000/new-password/${token}">link</a> 
+                to reset password</h4>`
             }).catch(error => console.log(error))
-            res.json({message:"check your email"})
+            res.json({msg:"check your email"})
     })
        
         
@@ -81,7 +82,7 @@ router.post('/new-password',(req,res)=>{
         if(rows.length === 0 && rows[0].expire_token > Date.now){
           console.log("rows length 0")
          //   return Promise.reject('This E-mail already in use!');
-         return res.status(422).json({error:"Try again session expired"})
+         return res.send({msg:"Try again session expired"})
 
         } bcrypt.hash(newPassword,12).then(hashedpassword=>{
         let sql = `UPDATE users
@@ -92,12 +93,13 @@ router.post('/new-password',(req,res)=>{
     // execute the UPDATE statement
 connection.query(sql, data, (error, results, fields) => {
     if (error){
-    return console.error(error.message);
+         res.send({msg:"An Error Ocurred! Please Try Again"})
     }
     else{
     console.log('Rows affected:', results.affectedRows);
-    res.send(results)}
-    });
+    res.send({msg:"Password Reset Succefull. Now You can Login"})
+}
+});
 });
     })
 });

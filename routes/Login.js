@@ -25,8 +25,13 @@ router.post("/login", (req, res) => {
 console.log(req.body);
       dbConnection.execute("SELECT * FROM `users` WHERE `email`=?", [email])
         .then(([rows]) => {
-            if(rows.length >1){
+            if(rows.length ===0){
               console.log('Email not found')
+              result.status=404;
+              result.msg="User Does Not Exists with this Email";
+              res.send(result);
+
+            //  res.status(404).send("")
             }
             
           else{
@@ -39,20 +44,19 @@ console.log(req.body);
                 //     expiresIn: 1440
                 //    })
                 //    res.send(token)
-                status = 200;
+                result.status = 200;
                 // Create a token
                 const payload = { user: email };
                 const options = {
                   expiresIn: "2d",
-                //  issuer: "https://scotch.io",
                 };
                 const secret = process.env.SECRET_KEY;
                 const token = jwt.sign(payload, secret, options);
 
               
                 result.token = token;
+                result.msg="Login Successfull";
                 result.status = status;
-                // result.result = user;
                 result.user = {
                     first_name: rows[0].first_name,
                     last_name: rows[0].last_name,
@@ -60,22 +64,20 @@ console.log(req.body);
                     email: rows[0].email,
                     contact: rows[0].contact,
                   };
-               // res.send(result.token);
-                //   res.redirect('/dashboard');
+              
               } else {
-                //  res.status(400).json({ error: 'Invalid Password!' })
-                status = 401;
-                result.status = status;
-                result.error = `Invalid Password `;
+                result.status = 401;
+                result.msg = `Invalid Password `;
               }
-              res.status(status).send(result);
+              res.send(result);
             })
             .catch((err) => {
               if (err) throw err;
             });
-
         
-    }} );
+    }
+
+  } );
 });
 
 module.exports = router;
