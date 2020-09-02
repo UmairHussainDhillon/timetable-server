@@ -108,7 +108,10 @@ router.post("/timetable", (req, res) => {
         }
       }}
 
-      //
+      //Weak Constraints
+//Instructors Forbidden Time Zone
+
+
     })
     .then((user) => {
       // INSERTING Table Row INTO DATABASE
@@ -139,6 +142,9 @@ router.post("/timetable", (req, res) => {
       }
     });
 });
+
+
+//Get Request to View Timetable
 router.get('/viewtimetable', function (req, res) {
   var data="Hello World";
   dbConnection

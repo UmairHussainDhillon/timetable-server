@@ -76,6 +76,10 @@ var ResetRouter = require('./routes/auth')
 app.use('/', ResetRouter);
 
 //
+var PreferenceRouter = require('./routes/AddPreference')
+app.use('/', PreferenceRouter);
+
+//
 
 app.get("/user", (req, res) => {
   res.send("its Working !"); // To check Route
