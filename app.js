@@ -80,6 +80,9 @@ var PreferenceRouter = require('./routes/AddPreference')
 app.use('/', PreferenceRouter);
 
 //
+var ClashRouter = require('./routes/AddClashes')
+app.use('/', ClashRouter);
+//
 
 app.get("/user", (req, res) => {
   res.send("its Working !"); // To check Route

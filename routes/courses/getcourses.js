@@ -12,14 +12,17 @@ router.post('/getcourses',(req,res)=>{
           console.log(rows.length)
          //   return Promise.reject('This E-mail already in use!');
          res.send(`error occured! `);
-
         }
-        res.send(rows);
+       else{ res.send(rows);}
+
     }).catch(err => {
         // THROW INSERTING USER ERROR'S
         if (err) throw err;
     });
   
+
+    // 
+    
  /*
     connection.query("select * from courses where semester="+semester,(err,array,feilds)=>{
         if (err) throw err
