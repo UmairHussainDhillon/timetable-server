@@ -6,7 +6,7 @@ var bodyparser = require("body-parser");
 const { Router } = require("express");
 var router = express.Router();
 
-router.post("/timetable", (req, res) => {
+router.post("/timetable", async (req, res) => {
   console.log(req.body);
 
   var instructor_id;
@@ -28,31 +28,79 @@ router.post("/timetable", (req, res) => {
   var WeakConstraint = false;
 
   var timetable = [];
+  let Present =false;
+  let ClashRow;
+
+ 
   //To get assisgned teacher of Course
   dbConnection
     .execute("SELECT * FROM `courses` WHERE `course_id`=?", [Course_id])
     .then(([rows]) => {
-      console.log(rows.length);
       if (rows[0].instructor_id == null) {
-        console.log("No Instructor");
         errors.push("Please Assign a Instructor First");
       }
       instructor_id = rows[0].instructor_id;
 
       semester = rows[0].semester;
       course_name = rows[0].course_name;
+    });
+ //For Clashes 
+ await dbConnection
+ .execute("SELECT * FROM `clashes`")
+ .then(([rows])  => {
+   
+   console.log("clash table length: "+rows.length)
+   for (let i = 0; i < rows.length; i++) {
+     if(rows[i].course_id==Course_id || rows[i].clash_course_id == Course_id){
+       Present = true; 
+       ClashRow = rows[i];
+       break;
+ //      console.log(ClashRow)
+     }
+     else{
+       Present = false;
+     }
+   }
 
-      console.log(semester);
 
+ });
+      //Instructors Forbidden Time Zone 
+    await dbConnection
+    .execute("SELECT * FROM `preference` ")
+    .then(([rows])  => {
+      console.log("Preference table length: "+rows.length)
+        for (let i = 0; i < rows.length; i++) {
+       if(rows[i].instructor_id==instructor_id &&rows[i].day_id==day_id && rows[i].slot_id==slot_id){
+         errors.push("Instructor Forbidden this Time Slot");
+         WeakConstraint=true;
+         break;
+       }
+  
+      }
     });
 
 
-  dbConnection
+    dbConnection
     .execute("SELECT * FROM `timetable` ")
-    .then(([rows]) => {
+    .then(([rows])  => {
       timetable = rows;
 
       //Constraints  Bussiness Logic
+    // For Clash
+      if(Present == true){
+        console.log("Present Checks is TRue")
+            for (let i = 0; i < timetable.length; i++) {
+            if(timetable[i].course_id == ClashRow.course_id || 
+              timetable[i].course_id == ClashRow.clash_course_id){
+                console.log("Clashing Course found in timetable")
+                if(timetable[i].day_id == day_id && timetable[i].slot_id == slot_id){
+              errors.push("Course Has Clash");
+              WeakConstraint=true;
+              break;
+              }
+            }
+          }
+        }
 
       // Friday Prayer Time
       if (day_id == 5 && slot_id == 3) {
@@ -90,7 +138,6 @@ router.post("/timetable", (req, res) => {
       }
       // for  Classroom ID
       for (let i = 0; i < timetable.length; i++) {
-        console.log(classroom_id)
        if(classroom_id === 5) {
        // No Classroom is Free
          errors.push("No Classroom is Free");
@@ -109,7 +156,9 @@ router.post("/timetable", (req, res) => {
       }}
 
       //Weak Constraints
-//Instructors Forbidden Time Zone
+      // For Teachers Forbidden Timezone
+ 
+   
 
 
     })
@@ -123,6 +172,7 @@ router.post("/timetable", (req, res) => {
             "INSERT INTO `timetable`(`course_id`, `instructor_id`, `slot_id`,`day_id`,`classroom_id`, `semester`,`course_name`) VALUES(?,?,?,?,?,?,?)",
             [Course_id, instructor_id, slot_id, day_id, classroom_id,semester,course_name]
           )
+
           .then((result) => {
             console.log("done");
             res.status(200).send(`Added in Table Successfully`);
