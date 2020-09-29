@@ -9,6 +9,7 @@ router.post("/addpreference",async(req,res)=>{
     var day_id = req.body.day_id;
     var slot_id = req.body.slot_id;
     var instructor_id = req.body.instructor_id;
+    console.log(req.body)
     //check if already exixts or not
   let check=false;
   await  dbConnection
@@ -29,8 +30,8 @@ if(check==true){
     res.send("Preference already exists in table");
     }
     else{
-         dbConnection.query("INSERT INTO `preference`(`day_id`, `instructor_id`, `slot_id`) VALUES(?,?,?)",
-    [day_id, instructor_id, slot_id])
+         dbConnection.query("INSERT INTO `preference`(`day_id`, `slot_id`, `instructor_id`) VALUES(?,?,?)",
+    [day_id, slot_id, instructor_id])
     .then((result) => {
         res.status(200).send(`Preference Noted...`);
       })
