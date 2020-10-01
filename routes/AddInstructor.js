@@ -96,8 +96,7 @@ router.post("/assigncourseinstructor", (req, res) => {
             if (rows.length == 0) {
               //   return Promise.reject('This E-mail already in use!');
               return res
-                .status(422)
-                .json({ error: "Please Enter Correct Course Code" });
+                .send({ error: "Please Enter Correct Course Code" });
             }
 
             // execute the UPDATE statement
