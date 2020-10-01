@@ -217,5 +217,40 @@ router.get('/viewtimetable', function (req, res) {
 });
 });
 
+//Post request to Delete a cell from timetable
+router.post ('/deleteSlot', function (req, res) {
+  console.log(req.body)
+  slot_id = req.body.slot_id;
+  day_id = req.body.day_id;
+  batch = req.body.Batch,
+  dbConnection
+  .execute("SELECT * FROM `timetable` ")
+  .then(([rows]) => {
+    for (let i = 0; i < rows.length; i++) {
+    if(rows[i].day_id==day_id && rows[i].slot_id == slot_id && rows[i].semester == batch){
+      dbConnection.query("delete from timetable where timetable_id="+rows[i].timetable_id,
+      (err,result)=>{
+if(err){
+  msg="Delete Fail"
+}
+});
+msg="Deleted Sucessfully"      
+console.log("Deleted"+ rows[i].timetable_id)
+    //  res.send(msg)
+      break;
+    }
+    else{
+      msg = "Record  not Found";
+     // console.log("cant find cell ")
+     // res.send(msg)
+    }}
+         res.send(msg)
+}) .catch((err) => {
+  // THROW INSERTING  ERROR'S
+  if (err) {
+    res.send(err);
+  }
+});
+});
 
 module.exports = router;
