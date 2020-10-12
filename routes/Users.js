@@ -62,25 +62,18 @@ var result;
 });
 // END OF REGISTER ROUTE
 
-/*
-users.get('/dashboard', (req, res) => {
-  var decoded = jwt.verify(req.headers['authorization'], process.env.SECRET_KEY)
 
-  User.findOne({
-    where: {
-      id: decoded.id
-    }
-  })
-    .then(user => {
-      if (user) {
-        res.json(user)
-      } else {
-        res.send('User does not exist')
-      }
-    })
-    .catch(err => {
-      res.send('error: ' + err)
-    })
-})*/
+router.post('/profile', (req, res) => {
+  console.log(req.body)
+  var email = req.body;
+  
+      dbConnection.execute('select * from users where email="+email"')
+      .then(([rows]) => {
+         res.status(200).send(rows);
+    }).catch(err => {
+              // THROW INSERTING USER ERROR'S
+              if (err) throw err;
+          });
+      })
 
 module.exports = router;
