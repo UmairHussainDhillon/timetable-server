@@ -83,6 +83,10 @@ app.use('/', PreferenceRouter);
 var ClashRouter = require('./routes/AddClashes')
 app.use('/', ClashRouter);
 //
+var FeedbackRouter = require('./routes/feedback')
+app.use('/', FeedbackRouter);
+
+//
 
 app.get("/user", (req, res) => {
   res.send("its Working !"); // To check Route
