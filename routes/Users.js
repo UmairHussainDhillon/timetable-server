@@ -62,18 +62,37 @@ var result;
 });
 // END OF REGISTER ROUTE
 
+var i=0;
 
 router.post('/profile', (req, res) => {
-  console.log(req.body)
-  var email = req.body;
-  
-      dbConnection.execute('select * from users where email="+email"')
-      .then(([rows]) => {
-         res.status(200).send(rows);
-    }).catch(err => {
-              // THROW INSERTING USER ERROR'S
-              if (err) throw err;
-          });
-      })
+  var email = req.body.email;
+  console.log(i+email)
 
+dbConnection.execute('SELECT * FROM `users` WHERE `email`=?', [email])
+    .then(([rows]) => {
+      console.log(rows)
+
+      res.status(200).send(rows);
+    }
+);
+      })
+router.post('/deleteProfile', (req, res) => {
+        var email = req.body.email;
+        console.log(i+email)
+        dbConnection.execute('DELETE FROM `users` WHERE `email`=?', [email])
+        .then(([rows]) => {
+          res.status(200).send("Account Deleted Successfully");
+        }).catch(err => {
+          // THROW INSERTING USER ERROR'S
+          res.send("Delete failed!");
+          if (err) throw err;
+      });
+    /*  
+      dbConnection.query("DELETE FROM  users where email="+email,
+      (err,result)=>{
+if(err){
+}else{
+}
+});*/
+            })
 module.exports = router;
