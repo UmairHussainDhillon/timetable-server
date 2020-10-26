@@ -26,6 +26,7 @@ app.use(
     resave: true,
     saveUninitialized: true,
   })
+  
 );
 app.use(cookieParser("secretcode"));
 app.use(passport.initialize());
