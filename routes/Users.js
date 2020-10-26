@@ -71,9 +71,9 @@ router.post('/profile', (req, res) => {
 dbConnection.execute('SELECT * FROM `users` WHERE `email`=?', [email])
     .then(([rows]) => {
       console.log(rows)
-
       res.status(200).send(rows);
     }
+    
 );
       })
 router.post('/deleteProfile', (req, res) => {

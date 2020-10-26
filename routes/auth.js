@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport(sendgridTransport({
 }))
 
 
-// REset Password Route
+// REset Password Route for Forget Password with token
 
 router.post('/reset-password',(req,res)=>{
     email=req.body.email;
@@ -113,4 +113,23 @@ connection.query(sql, data, (error, results, fields) => {
     })
 });
 
+// Update/Change Password WHile Logged IN
+router.post('/change-password',(req,res)=>{
+    console.log(req.body)
+    password=req.body.password;
+    email=req.body.email;
+    bcrypt.hash(password,12).then(hashedpassword=>{
+    let sql = `UPDATE users
+    SET password = ?
+    WHERE email = ?`;
+
+    let data = [hashedpassword, email];
+    connection.execute(sql, data, 
+        (error, results, fields) => {    
+    
+    });
+    res.send("Password updated Succefully")
+
+}) 
+});
 module.exports = router;
