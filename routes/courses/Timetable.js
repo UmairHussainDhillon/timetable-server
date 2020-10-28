@@ -245,6 +245,8 @@ console.log("Deleted"+ rows[i].timetable_id)
      // res.send(msg)
     }}
          res.send(msg)
+         console.log(msg)
+
 }) .catch((err) => {
   // THROW INSERTING  ERROR'S
   if (err) {

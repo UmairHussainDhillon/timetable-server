@@ -41,7 +41,7 @@ var result;
             [first_name,last_name, email,institute, contact,hash_pass,created])
            .then(result => {
           console.log("done");
-          result="your account has been created successfully... ";
+          result="your account has been created successfully Now You Can Login ";
 
           res.send(result);
          /* transporter.sendMail({
