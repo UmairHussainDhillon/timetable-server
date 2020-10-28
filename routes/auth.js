@@ -29,13 +29,14 @@ var Result;
       connection.execute('SELECT `email` FROM `users` WHERE `email`=?', [email])
     .then(([rows]) => {
         if(rows.length == 0){
+            console.log("User dont exists with this email")
             Result.status=422;
-            Result.msg="User dont exists with that email"
+            Result.msg="User dont exists with this email"
          //   return Promise.reject('This E-mail already in use!');
          return res.send(Result);
 
         }
-       
+  
 
 // execute the UPDATE statement
 console.log(req.body)
@@ -45,17 +46,17 @@ console.log(req.body)
         SET reset_token = ?,
         expire_token = ?
         WHERE email = ?`;
-
 let data = [reset_token,expire_token, email];
         connection.query(sql, data, (error, results, fields) => {
             if (error){
-                Result.status=422;
+                console.log("error working")
+               // Result.status=422;
                 Result.msg=error;
              return res.send(Result);
             }
             else{
-            console.log('Rows affected:', results.affectedRows);
-            Result.status=200;
+            console.log("Rows affected");
+          //  Result.status=200;
             Result.msg="Successful Now You Can Login"
           res.send(Result);}
             }).then((result)=>{
@@ -68,16 +69,14 @@ let data = [reset_token,expire_token, email];
                 to reset password</h4>`
             }).catch(error => console.log(error))
 
-            Result.status=200;
-            Result.msg="Successful Now You Can Login"
-         return res.send(Result);        })
+           // Result.status=200;
+         return res.send("Password Reset Link Sent to your Email");        })
        
         
 
         })
     })
 })
-
 // New Password Route
 router.post('/new-password',(req,res)=>{
     console.log(req.body)
