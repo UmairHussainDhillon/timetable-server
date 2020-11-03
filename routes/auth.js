@@ -88,6 +88,7 @@ router.post('/new-password',(req,res)=>{
         console.log(rows)
         if(rows.length === 0 && rows[0].expire_token > Date.now){
           console.log("rows length 0")
+          console.log("Try again session expired")
          //   return Promise.reject('This E-mail already in use!');
          return res.send({msg:"Try again session expired"})
 
@@ -100,11 +101,11 @@ router.post('/new-password',(req,res)=>{
     // execute the UPDATE statement
 connection.query(sql, data, (error, results, fields) => {
     if (error){
+        console.log("An Error Ocurred! Please Try Again")
          res.send({msg:"An Error Ocurred! Please Try Again"})
     }
     else{
-    console.log('Rows affected:', results.affectedRows);
-    
+    console.log("Password Reset Succefull. Now You can Login")
      res.send({msg:"Password Reset Succefull. Now You can Login"})
 }
 });

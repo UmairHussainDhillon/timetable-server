@@ -120,6 +120,7 @@ router.post("/timetable", async (req, res) => {
           //  status= false;
           break;
         }
+        
       }
       // for same Course at same Time
       for (let i = 0; i < timetable.length; i++) {
